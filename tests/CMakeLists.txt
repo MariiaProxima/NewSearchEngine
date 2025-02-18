@@ -1,33 +1,30 @@
 cmake_minimum_required (VERSION 3.8)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
 set(SrcFiles
-	${MY_SRC_DIR}/SearchEngine.cpp
-	${MY_SRC_DIR}/ConverterJSON.cpp
-	${MY_SRC_DIR}/InvertedIndex.cpp
+  ${MY_SRC_DIR}/SearchEngine.cpp
+  ${MY_SRC_DIR}/ConverterJSON.cpp
+  ${MY_SRC_DIR}/InvertedIndex.cpp
+  test_search_engine.cpp
 )
 
-set(TestFiles
-	test_search_engine.cpp
-)
+add_executable(GtestTests ${SrcFiles})
 
+cmake_policy(SET CMP0135 NEW)
 include(FetchContent)
-
 FetchContent_Declare(
   googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.12.1
+  URL
+    https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
 )
 FetchContent_MakeAvailable(googletest)
+
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(gtest_disable_pthreads on)
 enable_testing()
 include(GoogleTest)
 
-add_executable(GtestTests ${TestsFiles} ${SrcFiles})
-
 gtest_discover_tests(GtestTests)
 
-target_link_libraries(GtestTests nlohmann_json::nlohmann_json GTest::gtest_main)
+target_link_libraries(GtestTests PRIVATE nlohmann_json::nlohmann_json gtest_main)
 target_include_directories(GtestTests PUBLIC ${MY_INCLUDE_DIR})
